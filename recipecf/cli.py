@@ -417,6 +417,17 @@ def compare(args):
                            "ci95": np.quantile(draws, [.025, .975]).tolist(), "p": float(p)})
 
 
+def holm(args):
+    results = [json.loads(Path(path).read_text(encoding="utf-8")) for path in args.inputs]
+    order = np.argsort([result["p"] for result in results])
+    largest = 0.
+    for rank, index in enumerate(order):
+        largest = max(largest, min(1., (len(order) - rank) * results[index]["p"]))
+        results[index]["holm_p"] = largest
+        results[index]["source"] = args.inputs[index]
+    save_json(args.output, results)
+
+
 def main():
     parser = argparse.ArgumentParser(prog="recipecf")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -459,6 +470,9 @@ def main():
     p.add_argument("--output", required=True)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--resamples", type=int, default=10000)
+    p = commands.add_parser("holm")
+    p.add_argument("--inputs", nargs="+", required=True)
+    p.add_argument("--output", required=True)
     args = parser.parse_args()
     globals()[args.command](args)
 

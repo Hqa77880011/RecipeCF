@@ -94,6 +94,12 @@ recipecf compare --first runs/full/evaluation/predictions.npz --second runs/mlp/
 
 The plot command exports `comparison.csv` and one bar chart per shared numeric metric. The paired comparison recomputes normalized MISE on the intersection of both models' supported grids for every entity. It writes the mean paired difference, percentile 95% bootstrap interval, and a centered-bootstrap two-sided p value. Negative differences favor the first model.
 
+Apply Holm correction to a declared family of benchmark comparisons after producing one comparison JSON per benchmark:
+
+```bash
+recipecf holm --inputs runs/comparison.json runs/other_benchmark/comparison.json --output runs/holm.json
+```
+
 | Metric | Definition |
 | --- | --- |
 | `normalized_mise` | Per-entity supported-grid squared error divided by supported response variance, then averaged |
@@ -115,4 +121,4 @@ The manuscript specifies response interactions and assignment equations but does
 
 Action densities use six logit-space affine coupling layers. Cubic B-splines use fixed internal knots at 0.25, 0.50, and 0.75. Training has a fixed epoch budget rather than selecting epochs on the calibration data. The implemented comparison baseline is MLP-Concat; DRNet, VCNet, ACFR, DTRNet, DCNet, and WDBN are separate methods and are not aliases for that baseline.
 
-Grid regret evaluates candidate ranking on supplied ground truth. `evaluate --oracle process` also computes continuous decision regret using the included response function and eight-restart, 100-step oracle search. This is a numerical oracle-search reference, so search error can yield a negative estimated regret. For external simulators, `--oracle path/to/oracle.py` loads a function `response(raw_x, actions)` returning a differentiable PyTorch vector. `raw_x` contains the imputed conditions before standardization; the oracle must use the same response units as `y`. Computational costs describe the machine executing the command. CI checks Python syntax and package construction without running training or experiments.
+Grid regret evaluates candidate ranking on supplied ground truth. `evaluate --oracle process` also computes continuous decision regret using the included response function and eight-restart, 100-step oracle search. This is a numerical oracle-search reference, so search error can yield a negative estimated regret. For external simulators, `--oracle path/to/oracle.py` loads a function `response(raw_x, actions)` returning a differentiable PyTorch vector. `raw_x` contains the imputed conditions before standardization; the oracle must use the same response units as `y`. Computational costs describe the machine executing the command.
